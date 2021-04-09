@@ -1,0 +1,121 @@
+datasource postgres {
+  provider = "postgresql"
+  url      = env("POSTGRESQL_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  abone     Boolean?
+  createdAt DateTime @default(now())
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  men       Boolean?
+  password  String
+  roles     String[]
+  team      Team[]
+  ts        Boolean?
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+  women     Boolean?
+}
+
+model Team {
+  colorA            String?
+  colorB            String?
+  colorC            String
+  country           Country?          @relation(fields: [countryId], references: [id])
+  countryId         String?
+  createdAt         DateTime          @default(now())
+  goalkeepers       Goalkeeper[]
+  id                String            @id @default(cuid())
+  logo              String
+  matchStart        MatchStart?       @relation(name: "homeTeam", fields: [matchStartId], references: [id])
+  matchStartId      String?
+  matchStarts       MatchStart[]      @relation(name: "awayTeam")
+  name              String
+  playerLegendaries PlayerLegendary[]
+  players           Player[]
+  updatedAt         DateTime          @updatedAt
+  users             User[]
+}
+
+model Country {
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  name      String?
+  stades    Stade[]
+  teams     Team[]
+  updatedAt DateTime @updatedAt
+}
+
+model Goalkeeper {
+  age                Int?
+  birthday           DateTime?
+  createdAt          DateTime  @default(now())
+  id                 String    @id @default(cuid())
+  name               String?
+  number             Int?
+  positionGoalkeeper Int?
+  team               Team?     @relation(fields: [teamId], references: [id])
+  teamId             String?
+  updatedAt          DateTime  @updatedAt
+}
+
+model Player {
+  age        String?
+  Alternates MyTeam[]  @relation(name: "Alternates")
+  birthday   DateTime?
+  createdAt  DateTime  @default(now())
+  id         String    @id @default(cuid())
+  myTeams    MyTeam[]  @relation(name: "My_teamsOnPlayers")
+  name       String?
+  number     String?
+  team       Team?     @relation(fields: [teamId], references: [id])
+  teamId     String?
+  updatedAt  DateTime  @updatedAt
+}
+
+model Stade {
+  country   Country? @relation(fields: [countryId], references: [id])
+  countryId String?
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  name      String?
+  updatedAt DateTime @updatedAt
+}
+
+model MatchStart {
+  awayScore String?
+  awayTeam  Team[]    @relation(name: "awayTeam")
+  createdAt DateTime  @default(now())
+  date      DateTime?
+  homeScore String?
+  homeTeam  Team[]    @relation(name: "homeTeam")
+  id        String    @id @default(cuid())
+  myTeams   MyTeam[]
+  updatedAt DateTime  @updatedAt
+}
+
+model MyTeam {
+  alternates Player[]    @relation(name: "Alternates")
+  createdAt  DateTime    @default(now())
+  id         String      @id @default(cuid())
+  idMatch    MatchStart? @relation(fields: [idMatchId], references: [id])
+  idMatchId  String?
+  players    Player[]    @relation(name: "My_teamsOnPlayers")
+  scoreTotal String?
+  updatedAt  DateTime    @updatedAt
+}
+
+model PlayerLegendary {
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  name      String?
+  team      Team?    @relation(fields: [teamId], references: [id])
+  teamId    String?
+  updatedAt DateTime @updatedAt
+}
